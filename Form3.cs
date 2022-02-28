@@ -15,7 +15,7 @@ namespace BBBig
         {
             if (!string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrEmpty(textBox2.Text))
             {
-                using (StreamWriter writer = new StreamWriter(@"C:\Program Files (x86)\BBBig\neighbors.txt", false))
+                using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\neighbors.txt", false))
                 {
                     writer.Write(textBox1.Text + " " + textBox2.Text);
                     Close();
@@ -27,7 +27,7 @@ namespace BBBig
 
         private void Form3_Load(object sender, EventArgs e)
         {
-            Icon = new Icon(@"C:\Program Files (x86)\BBBig\lock.ico");
+            Icon = new Icon($@"C:\Users\{Environment.UserName}\Documents\BBBig\lock.ico");
         }
     }
 }

@@ -27,11 +27,11 @@ namespace BBBig
         }
         private void Form2_Load(object sender, EventArgs e)
         {
-            notifyIcon1.Icon = new Icon(@"C:\Program Files (x86)\BBBig\lock.ico");
-            Icon = new Icon(@"C:\Program Files (x86)\BBBig\lock.ico");
+            notifyIcon1.Icon = new Icon($@"C:\Users\{Environment.UserName}\Documents\BBBig\lock.ico");
+            Icon = new Icon($@"C:\Users\{Environment.UserName}\Documents\BBBig\lock.ico");
             if (new GroupForm().ShowDialog() == DialogResult.OK) {}
             string group;
-            using (StreamReader reader = new StreamReader(@"C:\Program Files (x86)\BBBig\group.txt"))
+            using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\group.txt"))
             {
                 group = reader.ReadToEnd();
             }
@@ -66,7 +66,7 @@ namespace BBBig
                         int first = TimeToInt(times[0]) - TimeToInt(DateTime.Now.ToShortTimeString());
                         int hours = first / 100;
                         int min = first - hours * 100;
-                        Thread.Sleep(new TimeSpan(hours, min, 0));
+                        Thread.Sleep(new TimeSpan(hours, (min - 4) > 0 ? min - 4 : min, 0));
                     }
                     endTime = times[1];
                     timer1.Start();
@@ -78,7 +78,7 @@ namespace BBBig
                         driver.SwitchTo().Window(driver.WindowHandles[1]);
                         if (driver.Url == "https://pegas.bsu.edu.ru/login/index.php")
                         {
-                            using (StreamReader reader = new StreamReader(@"C:\Program Files (x86)\BBBig\login.txt"))
+                            using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\login.txt"))
                             {
                                 string[] data = reader.ReadToEnd().Split('\n');
                                 if (!string.IsNullOrEmpty(data[0]))
@@ -110,7 +110,7 @@ namespace BBBig
             Visible = false;
             if (!string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrEmpty(textBox2.Text))
             {
-                using (StreamWriter writer = new StreamWriter(@"C:\Program Files (x86)\BBBig\login.txt", false))
+                using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\login.txt", false))
                 {
                     writer.Write(textBox1.Text);
                     writer.Write("\n");
@@ -125,7 +125,7 @@ namespace BBBig
                 driver.SwitchTo().Window(driver.WindowHandles[1]);
                 element = driver.FindElement(By.CssSelector("#page-header > div > div > div > div:nth-child(2)"));
                 string courseName = element.Text.Substring(0, element.Text.IndexOf('(') == -1 ? element.Text.Length : element.Text.IndexOf('(') - 1);
-                using (StreamReader reader = new StreamReader(@"C:\Program Files (x86)\BBBig\compliances.txt"))
+                using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\compliances.txt"))
                 {
                     string line;
                     while ((line = reader.ReadLine()) != null)
@@ -170,7 +170,7 @@ namespace BBBig
             {
                 if (see)
                 {
-                    using (StreamWriter writer = new StreamWriter(@"C:\Program Files (x86)\BBBig\compliances.txt", true))
+                    using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\compliances.txt", true))
                     {
                         writer.Write(textBox1.Text);
                         writer.Write("_");
@@ -200,7 +200,7 @@ namespace BBBig
                 driver.FindElement(By.CssSelector("#chatPanel > div > button")).Click();
             }
             catch (Exception) {}
-            using (StreamReader reader = new StreamReader(@"C:\Program Files (x86)\BBBig\neighbors.txt"))
+            using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\neighbors.txt"))
             {
                 string[] neighbors = reader.ReadToEnd().Split();
                 if (!string.IsNullOrEmpty(neighbors[0]))
@@ -216,13 +216,10 @@ namespace BBBig
                             {
                                 if (stopTimer)
                                 {
-                                    timer2.Interval = 60000;
+                                    timer2.Stop();
+                                    timer2.Interval = 420000;
+                                    timer2.Start();
                                     stopTimer = false;
-                                }
-                                else
-                                {
-                                    timer2.Interval = 8000;
-                                    stopTimer = true;
                                 }
                                 driver.FindElement(By.CssSelector("#message-input")).SendKeys("+");
                                 driver.FindElement(By.CssSelector(".sendButton--Z93EzE")).Click();
@@ -252,7 +249,7 @@ namespace BBBig
         private void изменитьГруппуToolStripMenuItem_Click(object sender, EventArgs e)
         {
             driver.Dispose();
-            using (StreamWriter writer = new StreamWriter(@"C:\Program Files (x86)\BBBig\group.txt", false))
+            using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\group.txt", false))
             {
                 writer.Write("");
             }
@@ -261,7 +258,7 @@ namespace BBBig
         private void изменитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             driver.Dispose();
-            using (StreamWriter writer = new StreamWriter(@"C:\Program Files (x86)\BBBig\login.txt", false))
+            using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\login.txt", false))
             {
                 writer.Write("");
             }
