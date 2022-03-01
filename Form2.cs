@@ -12,7 +12,7 @@ namespace BBBig
     public partial class Form2 : Form
     {
         readonly IWebDriver driver = new ChromeDriver();
-        string endTime;
+        string endTime = "23:59";
         bool see = true;
         bool stopTimer = true;
         bool addLink = false;
@@ -61,7 +61,7 @@ namespace BBBig
                         cells[1].Text.Substring(0, index - 1),
                         cells[1].Text.Substring(index + 2, cells[1].Text.Length - index - 2)
                     };
-                    if(TimeToInt(DateTime.Now.ToShortTimeString()) < TimeToInt(times[0]))
+                    if(TimeToInt(DateTime.Now.AddMinutes(31).ToShortTimeString()) < TimeToInt(times[0]))
                     {
                         int first = TimeToInt(times[0]) - TimeToInt(DateTime.Now.ToShortTimeString());
                         int hours = first / 100;
@@ -98,7 +98,7 @@ namespace BBBig
                 if (ee.Text.Contains(DateTime.Now.ToShortDateString()))
                     check = true;
             }
-            if (!check)
+            if (!check || TimeToInt(endTime) < TimeToInt(DateTime.Now.ToShortTimeString()))
             {
                 MessageBox.Show("Пар нет!", "Внимание");
                 driver.Dispose();
