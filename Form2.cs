@@ -35,125 +35,143 @@ namespace BBBig
             {
                 group = reader.ReadToEnd();
             }
-            driver.Navigate().GoToUrl($"https://www.bsu.edu.ru/bsu/resource/schedule/groups/index.php?group={group}");
+            driver.Navigate().GoToUrl($"https://bsuedu.ru/bsu/education/schedule/groups/index.php?group={group}");
             Thread.Sleep(2000);
-            var elements = driver.FindElements(By.XPath("//*[@id=\"shedule\"]/tbody/tr"));
-            bool check = false;
-            foreach (var ee in elements)
+            try
             {
-                if (check)
+                var elements = driver.FindElements(By.XPath("//*[@id=\"shedule\"]/tbody/tr"));
+                bool check = false;
+                foreach (var ee in elements)
                 {
-                    if (ee.Text.Contains(DateTime.Now.AddDays(1).ToShortDateString()))
-                        break;
-                    var cells = ee.FindElements(By.CssSelector("td"));
-                    int index = 0;
-                    try
+                    if (check)
                     {
-                        index = cells[1].Text.IndexOf("-");
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        driver.Dispose();
-                        Application.Exit();
-                    }
-                    string[] times =
-                    {
+                        if (ee.Text.Contains(DateTime.Now.AddDays(1).ToShortDateString()))
+                            break;
+                        var cells = ee.FindElements(By.CssSelector("td"));
+                        int index = 0;
+                        try
+                        {
+                            index = cells[1].Text.IndexOf("-");
+                        }
+                        catch (Exception)
+                        {
+                            driver.Dispose();
+                            Application.Exit();
+                        }
+                        string[] times =
+                        {
                         cells[1].Text.Substring(0, index - 1),
                         cells[1].Text.Substring(index + 2, cells[1].Text.Length - index - 2)
                     };
-                    if(TimeToInt(DateTime.Now.AddMinutes(31).ToShortTimeString()) < TimeToInt(times[0]))
-                    {
-                        int first = TimeToInt(times[0]) - TimeToInt(DateTime.Now.ToShortTimeString());
-                        int hours = first / 100;
-                        int min = first - hours * 100;
-                        Thread.Sleep(new TimeSpan(hours, (min - 4) > 0 ? min - 4 : min, 0));
-                    }
-                    endTime = times[1];
-                    timer1.Start();
-                    if(TimeToInt(DateTime.Now.AddMinutes(31).ToShortTimeString()) > TimeToInt(times[0])
-                        && TimeToInt(DateTime.Now.ToShortTimeString()) < TimeToInt(times[1]))
-                    {
-                        cells[3].FindElement(By.CssSelector("a")).Click();
-                        Thread.Sleep(500);
-                        driver.SwitchTo().Window(driver.WindowHandles[1]);
-                        if (driver.Url == "https://pegas.bsu.edu.ru/login/index.php")
+                        if (TimeToInt(DateTime.Now.AddMinutes(31).ToShortTimeString()) < TimeToInt(times[0]))
                         {
-                            using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\login.txt"))
-                            {
-                                string[] data = reader.ReadToEnd().Split('\n');
-                                if (!string.IsNullOrEmpty(data[0]))
-                                {
-                                    textBox1.Text = data[0];
-                                    textBox2.Text = data[1];
-                                    reader.Close();
-                                    button1_Click(button1, new EventArgs());
-                                }
-                                else
-                                    Visible = true;
-                            }
+                            int first = TimeToInt(times[0]) - TimeToInt(DateTime.Now.ToShortTimeString());
+                            int hours = first / 100;
+                            int min = first - hours * 100;
+                            Thread.Sleep(new TimeSpan(hours, (min - 4) > 0 ? min - 4 : min, 0));
                         }
-                        break;
+                        endTime = times[1];
+                        timer1.Start();
+                        if (TimeToInt(DateTime.Now.AddMinutes(31).ToShortTimeString()) > TimeToInt(times[0])
+                            && TimeToInt(DateTime.Now.ToShortTimeString()) < TimeToInt(times[1]))
+                        {
+                            cells[3].FindElement(By.CssSelector("a")).Click();
+                            Thread.Sleep(500);
+                            driver.SwitchTo().Window(driver.WindowHandles[1]);
+                            if (driver.Url == "https://pegas.bsu.edu.ru/login/index.php")
+                            {
+                                using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\login.txt"))
+                                {
+                                    string[] data = reader.ReadToEnd().Split('\n');
+                                    if (!string.IsNullOrEmpty(data[0]))
+                                    {
+                                        textBox1.Text = data[0];
+                                        textBox2.Text = data[1];
+                                        reader.Close();
+                                        button1_Click(button1, new EventArgs());
+                                    }
+                                    else
+                                        Visible = true;
+                                }
+                            }
+                            break;
+                        }
                     }
+                    if (ee.Text.Contains(DateTime.Now.ToShortDateString()))
+                        check = true;
                 }
-                if (ee.Text.Contains(DateTime.Now.ToShortDateString()))
-                    check = true;
+                if (!check || TimeToInt(endTime) < TimeToInt(DateTime.Now.ToShortTimeString()))
+                {
+                    MessageBox.Show("Пар нет!", "Внимание");
+                    driver.Dispose();
+                    Application.Exit();
+                }
             }
-            if (!check || TimeToInt(endTime) < TimeToInt(DateTime.Now.ToShortTimeString()))
+            catch (Exception)
             {
-                MessageBox.Show("Пар нет!", "Внимание");
+                Thread.Sleep(TimeSpan.FromMinutes(1));
                 driver.Dispose();
-                Application.Exit();
+                Application.Restart();
             }
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            Visible = false;
-            if (!string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrEmpty(textBox2.Text))
+            try
             {
-                using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\login.txt", false))
+                Visible = false;
+                if (!string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrEmpty(textBox2.Text))
                 {
-                    writer.Write(textBox1.Text);
-                    writer.Write("\n");
-                    writer.Write(textBox2.Text);
-                }
-                var element = driver.FindElement(By.CssSelector("#username"));
-                element.SendKeys(textBox1.Text);
-                element = driver.FindElement(By.CssSelector("#password"));
-                element.SendKeys(textBox2.Text);
-                driver.FindElement(By.CssSelector("#loginbtn")).Click();
-                Thread.Sleep(500);
-                driver.SwitchTo().Window(driver.WindowHandles[1]);
-                element = driver.FindElement(By.CssSelector("#page-header > div > div > div > div:nth-child(2)"));
-                string courseName = element.Text.Substring(0, element.Text.IndexOf('(') == -1 ? element.Text.Length : element.Text.IndexOf('(') - 1);
-                using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\compliances.txt"))
-                {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
+                    using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\login.txt", false))
                     {
-                        if(line.Split('_')[0] == courseName)
+                        writer.Write(textBox1.Text);
+                        writer.Write("\n");
+                        writer.Write(textBox2.Text);
+                    }
+                    var element = driver.FindElement(By.CssSelector("#username"));
+                    element.SendKeys(textBox1.Text);
+                    element = driver.FindElement(By.CssSelector("#password"));
+                    element.SendKeys(textBox2.Text);
+                    driver.FindElement(By.CssSelector("#loginbtn")).Click();
+                    Thread.Sleep(500);
+                    driver.SwitchTo().Window(driver.WindowHandles[1]);
+                    element = driver.FindElement(By.CssSelector("#page-header > div > div > div > div:nth-child(2)"));
+                    string courseName = element.Text.Substring(0, element.Text.IndexOf('(') == -1 ? element.Text.Length : element.Text.IndexOf('(') - 1);
+                    using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\compliances.txt"))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
                         {
-                            see = false;
-                            textBox1.Text = courseName;
-                            textBox2.Text = line.Split('_')[1];
-                            reader.Close();
-                            button2_Click(button2, new EventArgs());
-                            break;
+                            if (line.Split('_')[0] == courseName)
+                            {
+                                see = false;
+                                textBox1.Text = courseName;
+                                textBox2.Text = line.Split('_')[1];
+                                reader.Close();
+                                button2_Click(button2, new EventArgs());
+                                break;
+                            }
+                        }
+                        if (see)
+                        {
+                            textBox1.Clear();
+                            textBox2.Clear();
+                            label1.Text = "Название курса:";
+                            label2.Text = "Ссылка на онлайн-занятие:";
+                            button1.Visible = false;
+                            button2.Visible = true;
+                            Visible = true;
                         }
                     }
-                    if (see)
-                    {
-                        textBox1.Clear();
-                        textBox2.Clear();
-                        label1.Text = "Название курса:";
-                        label2.Text = "Ссылка на онлайн-занятие:";
-                        button1.Visible = false;
-                        button2.Visible = true;
-                        Visible = true;
-                    }
                 }
+                else
+                    MessageBox.Show("Введите логин и пароль!", "Внимание");
             }
-            else
-                MessageBox.Show("Введите логин и пароль!", "Внимание");
+            catch (Exception)
+            {
+                Thread.Sleep(TimeSpan.FromMinutes(1));
+                driver.Dispose();
+                Application.Restart();
+            }
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
