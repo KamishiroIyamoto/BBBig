@@ -183,33 +183,42 @@ namespace BBBig
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            Visible = false;
-            if (!string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrEmpty(textBox2.Text))
+            try
             {
-                if (see)
+                Visible = false;
+                if (!string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrEmpty(textBox2.Text))
                 {
-                    using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\compliances.txt", true))
+                    if (see)
                     {
-                        writer.Write(textBox1.Text);
-                        writer.Write("_");
-                        writer.WriteLine(textBox2.Text);
+                        using (StreamWriter writer = new StreamWriter($@"C:\Users\{Environment.UserName}\Documents\BBBig\compliances.txt", true))
+                        {
+                            writer.Write(textBox1.Text);
+                            writer.Write("_");
+                            writer.WriteLine(textBox2.Text);
+                        }
                     }
-                }
-                if (!addLink)
-                {
-                    driver.Navigate().GoToUrl(textBox2.Text);
-                    driver.FindElement(By.CssSelector("#join_button_input")).Click();
-                    Thread.Sleep(500);
-                    driver.SwitchTo().Window(driver.WindowHandles[2]);
-                    Thread.Sleep(3500);
-                    driver.FindElement(By.CssSelector("body > div.portal--27FHYi > div > div > div.content--IVOUy > div > div > span > button:nth-child(2)")).Click();
-                    timer2.Start();
+                    if (!addLink)
+                    {
+                        driver.Navigate().GoToUrl(textBox2.Text);
+                        driver.FindElement(By.CssSelector("#join_button_input")).Click();
+                        Thread.Sleep(500);
+                        driver.SwitchTo().Window(driver.WindowHandles[2]);
+                        Thread.Sleep(3500);
+                        driver.FindElement(By.CssSelector("body > div.portal--27FHYi > div > div > div.content--IVOUy > div > div > span > button:nth-child(2)")).Click();
+                        timer2.Start();
+                    }
+                    else
+                        addLink = false;
                 }
                 else
-                    addLink = false;
+                    MessageBox.Show("Вставьте ссылку на онлайн-занятие!", "Внимание");
             }
-            else
-                MessageBox.Show("Вставьте ссылку на онлайн-занятие!", "Внимание");
+            catch (Exception)
+            {
+                Thread.Sleep(TimeSpan.FromMinutes(1));
+                driver.Dispose();
+                Application.Restart();
+            }
         }
         private void timer2_Tick(object sender, EventArgs e)
         {

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "BBBig"
-#define MyAppVersion "1.1"
+#define MyAppVersion "1.3"
 #define MyAppPublisher "Kamishiro Iyamoto, Inc."
 #define MyAppURL "https://vk.com/kamishiro_iyamoto/"
 #define MyAppExeName "BBBig.exe"
@@ -49,7 +49,7 @@ Source: "C:\Users\lipko\source\repos\BBBig\BBBig\bin\Release\chromedriver.exe"; 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{userdocs}\BBBig\lock.ico";
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{userdocs}\BBBig\lock.ico"; Tasks: desktopicon
 
 [Run]
