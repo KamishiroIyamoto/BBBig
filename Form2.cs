@@ -58,11 +58,22 @@ namespace BBBig
                             driver.Dispose();
                             Application.Exit();
                         }
-                        string[] times =
+                        string[] times = null;
+                        try
                         {
-                            cells[1].Text.Substring(0, index - 1),
-                            cells[1].Text.Substring(index + 2, cells[1].Text.Length - index - 2)
-                        };
+                            times = new string[]
+                            {
+                                cells[1].Text.Substring(0, index - 1),
+                                cells[1].Text.Substring(index + 2, cells[1].Text.Length - index - 2)
+                            };
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show("Сегодня не лекции!", "Внимание");
+                            driver.Dispose();
+                            Close();
+                            Application.Exit();
+                        }
                         if (TimeToInt(DateTime.Now.AddMinutes(31).ToShortTimeString()) < TimeToInt(times[0]))
                         {
                             int first = TimeToInt(times[0]) - TimeToInt(DateTime.Now.ToShortTimeString());
