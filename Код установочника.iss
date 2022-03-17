@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "BBBig"
-#define MyAppVersion "1.3"
+#define MyAppVersion "1.3.1"
 #define MyAppPublisher "Kamishiro Iyamoto, Inc."
 #define MyAppURL "https://vk.com/kamishiro_iyamoto/"
 #define MyAppExeName "BBBig.exe"

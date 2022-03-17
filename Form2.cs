@@ -27,18 +27,18 @@ namespace BBBig
         }
         private void Form2_Load(object sender, EventArgs e)
         {
-            notifyIcon1.Icon = new Icon($@"C:\Users\{Environment.UserName}\Documents\BBBig\lock.ico");
-            Icon = new Icon($@"C:\Users\{Environment.UserName}\Documents\BBBig\lock.ico");
-            if (new GroupForm().ShowDialog() == DialogResult.OK) {}
-            string group;
-            using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\group.txt"))
-            {
-                group = reader.ReadToEnd();
-            }
-            driver.Navigate().GoToUrl($"https://bsuedu.ru/bsu/education/schedule/groups/index.php?group={group}");
-            Thread.Sleep(2000);
             try
             {
+                notifyIcon1.Icon = new Icon($@"C:\Users\{Environment.UserName}\Documents\BBBig\lock.ico");
+                Icon = new Icon($@"C:\Users\{Environment.UserName}\Documents\BBBig\lock.ico");
+                if (new GroupForm().ShowDialog() == DialogResult.OK) { }
+                string group;
+                using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\group.txt"))
+                {
+                    group = reader.ReadToEnd();
+                }
+                driver.Navigate().GoToUrl($"https://bsuedu.ru/bsu/education/schedule/groups/index.php?group={group}");
+                Thread.Sleep(2000);
                 var elements = driver.FindElements(By.XPath("//*[@id=\"shedule\"]/tbody/tr"));
                 bool check = false;
                 foreach (var ee in elements)
@@ -60,9 +60,9 @@ namespace BBBig
                         }
                         string[] times =
                         {
-                        cells[1].Text.Substring(0, index - 1),
-                        cells[1].Text.Substring(index + 2, cells[1].Text.Length - index - 2)
-                    };
+                            cells[1].Text.Substring(0, index - 1),
+                            cells[1].Text.Substring(index + 2, cells[1].Text.Length - index - 2)
+                        };
                         if (TimeToInt(DateTime.Now.AddMinutes(31).ToShortTimeString()) < TimeToInt(times[0]))
                         {
                             int first = TimeToInt(times[0]) - TimeToInt(DateTime.Now.ToShortTimeString());
@@ -224,44 +224,53 @@ namespace BBBig
         {
             try
             {
-                driver.FindElement(By.CssSelector("#chatPanel > div > button")).Click();
-            }
-            catch (Exception) {}
-            using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\neighbors.txt"))
-            {
-                string[] neighbors = reader.ReadToEnd().Split();
-                if (!string.IsNullOrEmpty(neighbors[0]))
+                try
                 {
-                    var element = driver.FindElement(By.CssSelector("#chatPanel > div > div > div:nth-child(1) > div > div"));
-                    var arr = element.FindElements(By.CssSelector(".content--BYIui"));
-                    foreach (var ee in arr)
+                    driver.FindElement(By.CssSelector("#chatPanel > div > button")).Click();
+                }
+                catch (Exception) {}
+                using (StreamReader reader = new StreamReader($@"C:\Users\{Environment.UserName}\Documents\BBBig\neighbors.txt"))
+                {
+                    string[] neighbors = reader.ReadToEnd().Split();
+                    if (!string.IsNullOrEmpty(neighbors[0]))
                     {
-                        string surname = ee.Text.Split()[0];
-                        if (surname == neighbors[0] || surname == neighbors[1])
+                        var element = driver.FindElement(By.CssSelector("#chatPanel > div > div > div:nth-child(1) > div > div"));
+                        var arr = element.FindElements(By.CssSelector(".content--BYIui"));
+                        foreach (var ee in arr)
                         {
-                            if (ee.Text.Substring(ee.Text.Length - 1, 1) == "+")
+                            string surname = ee.Text.Split()[0];
+                            if (surname == neighbors[0] || surname == neighbors[1])
                             {
-                                if (stopTimer)
+                                if (ee.Text.Substring(ee.Text.Length - 1, 1) == "+")
                                 {
-                                    timer2.Stop();
-                                    timer2.Interval = 420000;
-                                    timer2.Start();
-                                    stopTimer = false;
+                                    if (stopTimer)
+                                    {
+                                        timer2.Stop();
+                                        timer2.Interval = 420000;
+                                        timer2.Start();
+                                        stopTimer = false;
+                                    }
+                                    driver.FindElement(By.CssSelector("#message-input")).SendKeys("+");
+                                    driver.FindElement(By.CssSelector(".sendButton--Z93EzE")).Click();
+                                    break;
                                 }
-                                driver.FindElement(By.CssSelector("#message-input")).SendKeys("+");
-                                driver.FindElement(By.CssSelector(".sendButton--Z93EzE")).Click();
-                                break;
                             }
                         }
                     }
+                    else
+                    {
+                        timer2.Stop();
+                        reader.Dispose();
+                        if (new Form3().ShowDialog() == DialogResult.OK) {}
+                        timer2.Start();
+                    }
                 }
-                else
-                {
-                    timer2.Stop();
-                    reader.Dispose();
-                    if (new Form3().ShowDialog() == DialogResult.OK) { }
-                    timer2.Start();
-                }
+            }
+            catch (Exception)
+            {
+                Thread.Sleep(TimeSpan.FromMinutes(1));
+                driver.Dispose();
+                Application.Restart();
             }
         }
         private void закрытьToolStripMenuItem_Click(object sender, EventArgs e)
